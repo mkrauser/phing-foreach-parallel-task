@@ -1,0 +1,22 @@
+{
+    "name": "mak/phing-foreach-parallel-task",
+    "homepage": "https://github.com/mkrauser/phing-foreach-parallel-task",
+    "description": "phing task to run sub-tasks in a foreach-loop in separate, parallel processes",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matthias Krauser",
+            "email": "matthias@krauser.eu"
+        }
+    ],
+    "require": {
+        "php": ">=5.3",
+        "phing/phing": ">=2.7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MaK\\Phing\\Task\\": "src/"
+        }
+    }
+}
