@@ -23,6 +23,7 @@ namespace MaK\Phing\Task;
 use \BuildException;
 use \DocBlox_Parallel_Manager;
 use \FileList;
+use \FileSet;
 use \Mapper;
 use \PhingFile;
 use \Project;
@@ -106,8 +107,8 @@ class ForeachParallelTask extends Task
      */
     private $total_dirs  = 0;
 
-
-    private function getCallee() {
+    private function getCallee()
+    {
         $callee = $this->project->createTask("phingcall");
         $callee->setOwningTarget($this->getOwningTarget());
         $callee->setTaskName($this->getTaskName());
@@ -121,7 +122,8 @@ class ForeachParallelTask extends Task
      * This method does the work.
      * @return void
      */
-    function main() {
+    public function main()
+    {
         if ($this->list === null && count($this->filesets) == 0 && count($this->filelists) == 0) {
             throw new BuildException("Need either list, nested fileset or nested filelist to iterate through");
         }
@@ -305,23 +307,28 @@ class ForeachParallelTask extends Task
         }
     }
 
-    function setList($list) {
+    public function setList($list)
+    {
         $this->list = (string) $list;
     }
 
-    function setTarget($target) {
+    public function setTarget($target)
+    {
         $this->calleeTarget = (string) $target;
     }
 
-    function setParam($param) {
+    public function setParam($param)
+    {
         $this->param = (string) $param;
     }
 
-    function setAbsparam($absparam) {
+    public function setAbsparam($absparam)
+    {
         $this->absparam = (string) $absparam;
     }
 
-    function setDelimiter($delimiter) {
+    public function setDelimiter($delimiter)
+    {
         $this->delimiter = (string) $delimiter;
     }
 
@@ -339,7 +346,8 @@ class ForeachParallelTask extends Task
      *
      * @return void
      */
-    public function addFileSet(FileSet $fs) {
+    public function addFileSet(FileSet $fs)
+    {
         $this->filesets[] = $fs;
     }
 
@@ -347,21 +355,24 @@ class ForeachParallelTask extends Task
      * Nested creator, creates one Mapper for this task
      *
      * @access  public
-     * @return  object  The created Mapper type object
-     * @throws  BuildException
+     * @return object         The created Mapper type object
+     * @throws BuildException
      */
-    function createMapper() {
+    public function createMapper()
+    {
         if ($this->mapperElement !== null) {
             throw new BuildException("Cannot define more than one mapper", $this->location);
         }
         $this->mapperElement = new Mapper($this->project);
+
         return $this->mapperElement;
     }
 
     /**
      * @return Property
      */
-    function createProperty() {
+    public function createProperty()
+    {
         return $this->callee->createProperty();
     }
 
@@ -369,13 +380,10 @@ class ForeachParallelTask extends Task
      * Supports embedded <filelist> element.
      * @return FileList
      */
-    public function createFileList() {
-        $num = array_push($this->filelists, new FileList());
-        return $this->filelists[$num-1];
-    }
-
-    private function deepClone($object)
+    public function createFileList()
     {
-        return unserialize(serialize($object));
+        $num = array_push($this->filelists, new FileList());
+
+        return $this->filelists[$num-1];
     }
 }
