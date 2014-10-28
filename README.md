@@ -1,6 +1,6 @@
 ForeachParallel-Task for Phing
 ==============================
-![project status](http://stillmaintained.com/mkrauser/roundcube_fileapi_attachments.png)
+![project status](http://stillmaintained.com/mkrauser/phing-foreach-parallel-task.png)
 
 ## Maintainer Contact
 
