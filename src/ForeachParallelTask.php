@@ -20,16 +20,15 @@
 
 namespace MaK\Phing\Task;
 
-use \BuildException;
-use \FileList;
-use \FileSet;
-use \Mapper;
-use \PhingFile;
-use \Project;
-use \Task;
-
-use \DocBlox_Parallel_Manager,
-    \DocBlox_Parallel_Worker;
+use BuildException;
+use \MehrAlsNix\Parallel\Manager;
+use \MehrAlsNix\Parallel\Worker;
+use FileList;
+use FileSet;
+use Mapper;
+use PhingFile;
+use Project;
+use Task;
 
 /**
  * <foreach_parallel> task
@@ -136,17 +135,14 @@ class ForeachParallelTask extends Task
             throw new BuildException("You must supply a target to perform");
         }
 
-        @include_once 'phing/contrib/DocBlox/Parallel/Manager.php';
-        @include_once 'phing/contrib/DocBlox/Parallel/Worker.php';
-        @include_once 'phing/contrib/DocBlox/Parallel/WorkerPipe.php';
-        if (!class_exists('DocBlox_Parallel_Worker')) {
+        if (!class_exists(Worker::class)) {
             throw new BuildException(
-                'ForeachParallelTask depends on DocBlox being installed and on include_path.',
+                'ForeachParallelTask depends on phpDocumentor/Parallel being installed and on include_path.',
                 $this->getLocation()
             );
         }
 
-        $parallelManager = new DocBlox_Parallel_Manager();
+        $parallelManager = new Manager();
         $parallelManager->setProcessLimit($this->threadCount);
 
         $mapper = null;
@@ -180,7 +176,7 @@ class ForeachParallelTask extends Task
                 $prop->setOverride(true);
                 $prop->setName($this->param);
                 $prop->setValue($value);
-                $worker = new DocBlox_Parallel_Worker(
+                $worker = new Worker(
                     array($callee, 'main'),
                     array($callee)
                 );
@@ -222,7 +218,7 @@ class ForeachParallelTask extends Task
      * @param array     $srcFiles
      * @param array     $srcDirs
      */
-    protected function process(DocBlox_Parallel_Manager $parallelManager, Task $callee, PhingFile $fromDir, $srcFiles, $srcDirs)
+    protected function process(Manager $parallelManager, Task $callee, PhingFile $fromDir, $srcFiles, $srcDirs)
     {
         $mapper = null;
 
@@ -261,7 +257,7 @@ class ForeachParallelTask extends Task
                 $prop->setValue($value);
             }
 
-            $worker = new DocBlox_Parallel_Worker(
+            $worker = new Worker(
                 array($callee, 'main'),
                 array($callee)
             );
@@ -300,7 +296,7 @@ class ForeachParallelTask extends Task
                 $prop->setValue($value);
             }
 
-            $worker = new DocBlox_Parallel_Worker(
+            $worker = new Worker(
                 array($callee, 'main'),
                 array($callee)
             );
@@ -363,7 +359,7 @@ class ForeachParallelTask extends Task
     public function createMapper()
     {
         if ($this->mapperElement !== null) {
-            throw new BuildException("Cannot define more than one mapper", $this->location);
+            throw new BuildException("Cannot define more than one mapper", $this->getLocation());
         }
         $this->mapperElement = new Mapper($this->project);
 
