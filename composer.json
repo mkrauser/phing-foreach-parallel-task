@@ -10,9 +10,11 @@
             "email": "matthias@krauser.eu"
         }
     ],
+    "prefer-stable": true,
+    "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3",
-        "phing/phing": ">=2.7.0"
+        "php": ">=7.1",
+        "phing/phing": "^3.0.0"
     },
     "autoload": {
         "psr-4": {
