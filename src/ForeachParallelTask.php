@@ -20,15 +20,18 @@
 
 namespace MaK\Phing\Task;
 
-use BuildException;
-use \MehrAlsNix\Parallel\Manager;
-use \MehrAlsNix\Parallel\Worker;
-use FileList;
-use FileSet;
-use Mapper;
-use PhingFile;
-use Project;
-use Task;
+use MehrAlsNix\Parallel\Manager;
+use MehrAlsNix\Parallel\Worker;
+use Phing\Exception\BuildException;
+use Phing\Io\File;
+use Phing\Io\FileSystem;
+use Phing\Project;
+use Phing\Task;
+use Phing\Task\System\PhingTask;
+use Phing\Task\System\PropertyTask;
+use Phing\Type\FileList;
+use Phing\Type\FileSet;
+use Phing\Type\Mapper;
 
 /**
  * <foreach_parallel> task
@@ -62,6 +65,12 @@ use Task;
  */
 class ForeachParallelTask extends Task
 {
+    /**
+     * The called Phing task.
+     *
+     * @var PhingTask
+     */
+    private $callee;
 
     /** Delimter-separated list of values to process. */
     private $list;
@@ -106,7 +115,7 @@ class ForeachParallelTask extends Task
      * Total number of directories processed
      * @var integer
      */
-    private $total_dirs  = 0;
+    private $total_dirs = 0;
 
     private function getCallee()
     {
@@ -115,6 +124,7 @@ class ForeachParallelTask extends Task
         $callee->setTaskName($this->getTaskName());
         $callee->setLocation($this->getLocation());
         $callee->init();
+        $this->callee = $callee;
 
         return $callee;
     }
@@ -166,7 +176,8 @@ class ForeachParallelTask extends Task
                     }
                     $value = array_shift($value);
                 }
-                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''), Project::MSG_VERBOSE);
+                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''),
+                    Project::MSG_VERBOSE);
                 $callee = $this->getCallee();
                 $callee->setTarget($this->calleeTarget);
                 $callee->setInheritAll(true);
@@ -194,9 +205,9 @@ class ForeachParallelTask extends Task
 
         // filesets
         foreach ($this->filesets as $fs) {
-            $ds       = $fs->getDirectoryScanner($this->project);
+            $ds = $fs->getDirectoryScanner($this->project);
             $srcFiles = $ds->getIncludedFiles();
-            $srcDirs  = $ds->getIncludedDirectories();
+            $srcDirs = $ds->getIncludedDirectories();
 
             $this->process($parallelManager, $this->getCallee(), $fs->getDir($this->project), $srcFiles, $srcDirs);
         }
@@ -204,21 +215,23 @@ class ForeachParallelTask extends Task
         $parallelManager->execute();
 
         if ($this->list === null) {
-            $this->log("Processed {$this->total_dirs} directories and {$this->total_files} files", Project::MSG_VERBOSE);
+            $this->log("Processed {$this->total_dirs} directories and {$this->total_files} files",
+                Project::MSG_VERBOSE);
         } else {
-            $this->log("Processed $total_entries entr" . ($total_entries > 1 ? 'ies' : 'y') . " in list", Project::MSG_VERBOSE);
+            $this->log("Processed $total_entries entr" . ($total_entries > 1 ? 'ies' : 'y') . " in list",
+                Project::MSG_VERBOSE);
         }
     }
 
     /**
      * Processes a list of files & directories
      *
-     * @param Task      $callee
-     * @param PhingFile $fromDir
-     * @param array     $srcFiles
-     * @param array     $srcDirs
+     * @param Task $callee
+     * @param File $fromDir
+     * @param array $srcFiles
+     * @param array $srcDirs
      */
-    protected function process(Manager $parallelManager, Task $callee, PhingFile $fromDir, $srcFiles, $srcDirs)
+    protected function process(Manager $parallelManager, Task $callee, File $fromDir, $srcFiles, $srcDirs)
     {
         $mapper = null;
 
@@ -250,7 +263,8 @@ class ForeachParallelTask extends Task
             }
 
             if ($this->param) {
-                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''), Project::MSG_VERBOSE);
+                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''),
+                    Project::MSG_VERBOSE);
                 $prop = $callee->createProperty();
                 $prop->setOverride(true);
                 $prop->setName($this->param);
@@ -268,7 +282,7 @@ class ForeachParallelTask extends Task
         $dircount = count($srcDirs);
         $this->total_dirs += $dircount;
 
-        for ($j = 0; $j <  $dircount; $j++) {
+        for ($j = 0; $j < $dircount; $j++) {
             $value = $srcDirs[$j];
             $premapped = "";
 
@@ -289,7 +303,8 @@ class ForeachParallelTask extends Task
             }
 
             if ($this->param) {
-                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''), Project::MSG_VERBOSE);
+                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''),
+                    Project::MSG_VERBOSE);
                 $prop = $callee->createProperty();
                 $prop->setOverride(true);
                 $prop->setName($this->param);
@@ -307,27 +322,27 @@ class ForeachParallelTask extends Task
 
     public function setList($list)
     {
-        $this->list = (string) $list;
+        $this->list = (string)$list;
     }
 
     public function setTarget($target)
     {
-        $this->calleeTarget = (string) $target;
+        $this->calleeTarget = (string)$target;
     }
 
     public function setParam($param)
     {
-        $this->param = (string) $param;
+        $this->param = (string)$param;
     }
 
     public function setAbsparam($absparam)
     {
-        $this->absparam = (string) $absparam;
+        $this->absparam = (string)$absparam;
     }
 
     public function setDelimiter($delimiter)
     {
-        $this->delimiter = (string) $delimiter;
+        $this->delimiter = (string)$delimiter;
     }
 
     /**
@@ -367,7 +382,7 @@ class ForeachParallelTask extends Task
     }
 
     /**
-     * @return Property
+     * @return PropertyTask
      */
     public function createProperty()
     {
@@ -382,6 +397,6 @@ class ForeachParallelTask extends Task
     {
         $num = array_push($this->filelists, new FileList());
 
-        return $this->filelists[$num-1];
+        return $this->filelists[$num - 1];
     }
 }
