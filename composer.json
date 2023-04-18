@@ -13,13 +13,18 @@
     "prefer-stable": true,
     "minimum-stability": "dev",
     "require": {
-        "php": "^7.3 || ^7.4 || ^8.0",
-        "phing/phing": "^3.0.0",
+        "php": "^7.3 || ^7.4 || ^8.0 || ^8.1 || ^8.2",
+        "phing/phing": "dev-main",
         "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
             "MaK\\Phing\\Task\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "phing/phing-composer-configurator": true
         }
     }
 }
