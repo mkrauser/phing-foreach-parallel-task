@@ -14,8 +14,9 @@
     "minimum-stability": "dev",
     "require": {
         "php": "^7.3 || ^7.4 || ^8.0 || ^8.1 || ^8.2",
-        "phing/phing": "dev-main",
-        "ext-json": "*"
+        "ext-json": "*",
+        "mehr-als-nix/parallel": "^1.0",
+        "phing/phing": "dev-main"
     },
     "autoload": {
         "psr-4": {
@@ -23,6 +24,7 @@
         }
     },
     "config": {
+        "sort-packages": true,
         "allow-plugins": {
             "phing/phing-composer-configurator": true
         }
